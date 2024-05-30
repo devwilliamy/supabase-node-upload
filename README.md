@@ -16,3 +16,14 @@ If you run into an error about ID conflict, check saved queries in supabase and 
 Other common problems: make/model/year doesn't exist in their respective table. Look up if there are new make/model. Also double check because sometimes there are just typos that need to be fixed.
 
 Relation doesn't exist: Make sure the foreign keys are pointed to the right tables.
+
+### Sample ENV
+
+```
+NEXT_PUBLIC_SUPABASE_ADMIN_NODE_URL=
+NEXT_PUBLIC_SUPABASE_ADMIN_NODE_KEY=
+
+
+NEXT_PUBLIC_SUPABASE_URL=
+NEXT_PUBLIC_SUPABASE_KEY=
+```
