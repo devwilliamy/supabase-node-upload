@@ -15,6 +15,13 @@ const supabaseAdmin = createClient(
 // Define the batch size for pagination
 const pageSize = 4000;
 
+const PRODUCT_TABLE = "Products_20240529_2"
+const RELATIONAL_TABLE = "relations_product_20240529_2"
+const MODEL_TABLE = 'Model'
+const MAKE_TABLE = 'Make'
+const TYPE_TABLE = 'Type'
+const YEARS_TABLE = "Years"
+
 async function fetchAndUploadData() {
   let pageIndex = 0;
   let hasMore = true;
@@ -61,18 +68,18 @@ async function fetchAndUploadData() {
 async function createRelationalTable() {
   const pageSize = 4000;
   const { data: models, error: modelError } = await supabaseAdmin
-    .from("model_20240425")
+    .from(MODEL_TABLE)
     .select("id, name");
   // Check if the make exists
   const { data: makes, error: makeError } = await supabaseAdmin
-    .from("make_20240425")
+    .from(MAKE_TABLE)
     .select("id, name");
   const { data: types, error } = await supabaseAdmin
-    .from("type_20240425")
+    .from(TYPE_TABLE)
     .select("id, name");
 
   const { data: years, error: err_date } = await supabaseAdmin
-    .from("year_20240425")
+    .from(YEARS_TABLE)
     .select("id, name");
 
   let pageIndex = 0;
@@ -84,7 +91,7 @@ async function createRelationalTable() {
       error,
       count,
     } = await supabaseAdmin
-      .from("Products_20240425")
+      .from(PRODUCT_TABLE)
       .select("id, sku,make,model,year_generation,type")
       .order("id", { ascending: true })
       .range(pageIndex * pageSize, (pageIndex + 1) * pageSize - 1);
@@ -172,6 +179,12 @@ async function prepareAndBatchInsertData(
       row.model_id = model.id;
     }
 
+    // Find type_id
+    const type = types.find((m) => m.name === product.type);
+    if (type) {
+      row.type_id = type.id;
+    }
+
     const [startYear, endYear] = product.year_generation
       .split("-")
       .map((year) => parseInt(year));
@@ -211,9 +224,10 @@ async function prepareAndBatchInsertData(
 
 async function batchInsert(rows) {
   const { data: relation_data, error: relationInsertError } =
-    await supabaseAdmin.from("relations_product_20240425").insert(rows);
+    await supabaseAdmin.from(RELATIONAL_TABLE).insert(rows);
   if (relationInsertError) {
     console.log(relationInsertError);
+    // ID : 14452
   }
 }
 // fetchAndUploadData();
